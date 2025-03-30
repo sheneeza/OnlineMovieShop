@@ -1,21 +1,27 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using MovieMVCApp.Models;
+using ApplicationCore.Contracts.Services;
+using ApplicationCore.Models;
+
 
 namespace MovieMVCApp.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly IMovieService _movieService;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, IMovieService movieService)
     {
         _logger = logger;
+        _movieService = movieService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var movies = await _movieService.GetTopMoviesAsync(); // ✅ Get movie posters
+        return View(movies); // ✅ Pass to view
     }
 
     public IActionResult Privacy()

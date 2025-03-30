@@ -12,4 +12,9 @@ public class User
     public int PhoneNumber { get; set; }
     public string ProfilePictureUrl { get; set; } = string.Empty;
     public string Salt { get; set; } = string.Empty;
+    
+    public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
+    public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
+    public ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 }

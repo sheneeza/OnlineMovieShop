@@ -7,4 +7,6 @@ public class Cast
     public string Name { get; set; } = string.Empty;
     public string ProfilePath { get; set; } = string.Empty;
     public string TmdbUrl { get; set; } = string.Empty;
+    
+    public ICollection<MovieCast> MovieCasts { get; set; } = new List<MovieCast>();
 }
