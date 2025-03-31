@@ -21,17 +21,21 @@ namespace Infrastructure.Services
             _favoriteRepository = favoriteRepository;
         }
 
-        public async Task<IEnumerable<MovieCardModel>> GetPurchasedMoviesAsync(int userId)
+        public async Task<IEnumerable<PurchaseMovieCardModel>> GetPurchasedMoviesAsync(int userId)
         {
-            var movies = await _purchaseRepository.GetMoviesPurchasedByUser(userId);
+            var purchases = await _purchaseRepository.GetPurchasesByUserAsync(userId); // new method
 
-            return movies.Select(m => new MovieCardModel
+            return purchases.Select(p => new PurchaseMovieCardModel
             {
-                Id = m.Id,
-                Title = m.Title,
-                PosterUrl = m.PosterUrl
+                Id = p.Movie.Id,
+                Title = p.Movie.Title,
+                PosterUrl = p.Movie.PosterUrl ?? "/images/default.jpg",
+                PurchaseDateTime = p.PurchaseDateTime,
+                TotalPrice = p.TotalPrice,
+                PurchaseNumber = p.PurchaseNumber
             });
         }
+
 
         public async Task<IEnumerable<MovieCardModel>> GetFavoriteMoviesAsync(int userId)
         {

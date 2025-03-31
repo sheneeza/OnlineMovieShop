@@ -44,15 +44,23 @@ namespace MovieMVCApp.Controllers
         }
 
 
-        // Purchased movies
+        //purchases
         [HttpGet]
         public async Task<IActionResult> Purchases()
         {
-            var userId = int.Parse(User.FindFirst("NameIdentifier")!.Value);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return RedirectToAction("Login", "Account"); 
+            }
+
+            var userId = int.Parse(userIdClaim.Value);
             var movies = await _userService.GetPurchasedMoviesAsync(userId);
 
             return View(movies);
         }
+
 
         // Favorites
         [HttpGet]

@@ -35,6 +35,28 @@ public class MoviesController : Controller
 
         return View("ByGenre", pagedMovies);
     }
+    
+    [HttpGet("movies/details/{id}")]
+    public async Task<IActionResult> Details(int id)
+    {
+        int? userId = null;
+
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim != null)
+            {
+                userId = int.Parse(userIdClaim.Value);
+            }
+        }
+
+        var movie = await _movieService.GetMovieDetailsAsync(id, userId);
+        if (movie == null)
+            return NotFound();
+
+        return View(movie);
+    }
+
 
 }
 

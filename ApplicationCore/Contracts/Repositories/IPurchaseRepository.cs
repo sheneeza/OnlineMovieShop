@@ -4,5 +4,7 @@ namespace ApplicationCore.Repositories;
 
 public interface IPurchaseRepository: IRepository<Purchase>
 {
-    Task<IEnumerable<Movie>> GetMoviesPurchasedByUser(int userId);
+    Task<IEnumerable<Purchase>> GetPurchasesByUserAsync(int userId);
+
+    Task<bool> IsMoviePurchasedByUserAsync(int movieId, int userId);
 }

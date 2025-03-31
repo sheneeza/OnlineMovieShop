@@ -11,7 +11,7 @@ public interface IMovieService
     
     Task<IEnumerable<MovieCardModel>> GetMoviesByGenreSortedAsync(int genreId, string sortBy);
 
+    Task<MovieDetailsModel?> GetMovieDetailsAsync(int id, int? userId = null);
 
 
-    
 }

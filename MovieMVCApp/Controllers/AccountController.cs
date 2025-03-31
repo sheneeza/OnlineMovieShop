@@ -72,7 +72,6 @@ namespace MovieMVCApp.Controllers
 
             try
             {
-                // 🔁 Convert ViewModel to Core Model
                 var registerModel = new RegisterModel
                 {
                     FirstName = model.FirstName,

@@ -14,13 +14,19 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Movie>> GetMoviesPurchasedByUser(int userId)
+        public async Task<IEnumerable<Purchase>> GetPurchasesByUserAsync(int userId)
         {
             return await _context.Purchases
-                .Where(p => p.UserId == userId)
                 .Include(p => p.Movie)
-                .Select(p => p.Movie)
+                .Where(p => p.UserId == userId)
                 .ToListAsync();
+        }
+
+        
+        public async Task<bool> IsMoviePurchasedByUserAsync(int movieId, int userId)
+        {
+            return await _context.Purchases
+                .AnyAsync(p => p.MovieId == movieId && p.UserId == userId);
         }
     }
 }

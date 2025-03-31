@@ -13,6 +13,17 @@ public class MovieRepository:BaseRepository<Movie>,IMovieRepository
     {
         _context = movieDbContext;
     }
+    
+    public Movie? GetById(int id)
+    {
+        return _context.Movies
+            .Include(m => m.MovieGenres).ThenInclude(mg => mg.Genre)
+            .Include(m => m.MovieCasts).ThenInclude(mc => mc.Cast)
+            .Include(m => m.Reviews)
+            .Include(m => m.Trailers)
+            .FirstOrDefault(m => m.Id == id);
+    }
+
 
     public IEnumerable<Movie> GetTopRatedMovies()
     {
