@@ -20,8 +20,8 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var movies = await _movieService.GetTopMoviesAsync(); // ✅ Get movie posters
-        return View(movies); // ✅ Pass to view
+        var movies = await _movieService.GetTopMoviesAsync(); 
+        return View(movies); 
     }
 
     public IActionResult Privacy()

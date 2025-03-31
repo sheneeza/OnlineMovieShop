@@ -16,10 +16,10 @@ namespace Infrastructure.Services
 
         public async Task<IEnumerable<MovieCardModel>> GetTopMoviesAsync()
         {
-            var movies = _movieRepository.GetTopRatedMovies(); // or GetAll()
+            var movies = _movieRepository.GetTopRatedMovies(); 
 
             return movies
-                .Take(24) // Show only top 24
+                .Take(24) 
                 .Select(m => new MovieCardModel
                 {
                     Id = m.Id,
@@ -55,5 +55,29 @@ namespace Infrastructure.Services
 
             return Task.FromResult(result);
         }
+        
+        public async Task<IEnumerable<MovieCardModel>> GetMoviesByGenreSortedAsync(int genreId, string sortBy)
+        {
+            var movies = _movieRepository.GetMoviesByGenre(genreId);
+
+            movies = sortBy switch
+            {
+                "releaseDate" => movies.OrderByDescending(m => m.ReleaseDate),
+                _ => movies.OrderBy(m => m.Title)
+            };
+
+            return await Task.FromResult(
+                movies.Select(m => new MovieCardModel
+                {
+                    Id = m.Id,
+                    Title = m.Title,
+                    PosterUrl = m.PosterUrl
+                })
+            );
+        }
+
+
     }
+    
+    
 }

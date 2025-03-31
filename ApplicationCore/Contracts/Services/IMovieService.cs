@@ -9,4 +9,9 @@ public interface IMovieService
     Task<IEnumerable<MovieCardModel>> GetTopRatedMoviesAsync();
     Task<IEnumerable<MovieCardModel>> GetMoviesByGenreAsync(int genreId);
     
+    Task<IEnumerable<MovieCardModel>> GetMoviesByGenreSortedAsync(int genreId, string sortBy);
+
+
+
+    
 }

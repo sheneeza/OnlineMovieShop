@@ -16,7 +16,7 @@ public class MovieRepository:BaseRepository<Movie>,IMovieRepository
 
     public IEnumerable<Movie> GetTopRatedMovies()
     {
-        // Placeholder logic using Revenue
+        
         return _context.Movies
             .OrderByDescending(m => m.Revenue)
             .Take(24)
@@ -28,7 +28,6 @@ public class MovieRepository:BaseRepository<Movie>,IMovieRepository
         return _context.Movies
             .Include(m => m.MovieGenres)
             .Where(m => m.MovieGenres.Any(g => g.GenreId == genreId))
-            .Take(24)
             .ToList();
     }
 

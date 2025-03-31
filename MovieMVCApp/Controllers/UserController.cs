@@ -1,133 +1,77 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
-using MovieMVCApp.Models;
-using Infrastructure.Data;
-using ApplicationCore.Entities;
-using MovieMVCApp.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ApplicationCore.Contracts.Services;
 
 namespace MovieMVCApp.Controllers
 {
+    [Authorize] // Require login for all actions
     public class UserController : Controller
     {
-        private readonly MovieDbContext _context;
+        private readonly IUserService _userService;
 
-        public UserController(MovieDbContext context)
+        public UserController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
+        // View Profile / Account
         [HttpGet]
-        public IActionResult Login()
+        [Authorize]
+        public async Task<IActionResult> Account()
         {
-            return View();
-        }
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            if (!ModelState.IsValid)
+            if (userIdClaim == null)
             {
-                return View(model);
+                // Not logged in — redirect to login
+                return RedirectToAction("Login", "Account");
             }
 
-            // Find the user by email
-            var user = _context.Users.FirstOrDefault(u => u.Email == model.Email);
-            if (user == null)
+            if (!int.TryParse(userIdClaim.Value, out int userId))
             {
-                ModelState.AddModelError("", "Invalid email or password.");
-                return View(model);
+                return BadRequest("Invalid user ID");
             }
 
-            // Hash the input password with the stored salt
-            var hashedInput = PasswordHelper.HashPassword(model.Password, user.Salt);
+            var profile = await _userService.GetUserProfileAsync(userId);
 
-            // Compare with stored hashed password
-            if (hashedInput != user.HashedPassword)
+            if (profile == null)
             {
-                ModelState.AddModelError("", "Invalid email or password.");
-                return View(model);
+                return NotFound("User profile not found.");
             }
 
-            // Auth success – build claims
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Email),
-                new Claim("FullName", $"{user.FirstName} {user.LastName}")
-            };
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-            return RedirectToAction("Index", "Home");
-        }
-
-        
-        [HttpPost]
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return View(profile);
         }
 
 
+        // Purchased movies
         [HttpGet]
-        public IActionResult Register()
+        public async Task<IActionResult> Purchases()
         {
-            return View();
+            var userId = int.Parse(User.FindFirst("NameIdentifier")!.Value);
+            var movies = await _userService.GetPurchasedMoviesAsync(userId);
+
+            return View(movies);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        // Favorites
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Favorites()
         {
-            if (!ModelState.IsValid)
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
             {
-                return View(model);
+                return RedirectToAction("Login", "Account");
             }
 
-            // Check if email is already used
-            if (_context.Users.Any(u => u.Email == model.Email))
-            {
-                ModelState.AddModelError("Email", "This email is already registered.");
-                return View(model);
-            }
+            var userId = int.Parse(userIdClaim.Value);
 
-            // Hash password
-            var salt = PasswordHelper.GenerateSalt();
-            var hashedPassword = PasswordHelper.HashPassword(model.Password, salt);
+            var movies = await _userService.GetFavoriteMoviesAsync(userId);
 
-            var user = new User
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                DateOfBirth = model.DateOfBirth ?? DateTime.MinValue,
-                Email = model.Email,
-                HashedPassword = hashedPassword,
-                Salt = salt
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            // Auto-login after register
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Email),
-                new Claim("FullName", $"{user.FirstName} {user.LastName}")
-
-            };
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-            return RedirectToAction("Index", "Home");
+            return View(movies);
         }
+
     }
 }
