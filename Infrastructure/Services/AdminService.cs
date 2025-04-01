@@ -8,25 +8,20 @@ namespace Infrastructure.Services;
 public class AdminService : IAdminService
 {
     private readonly IMovieRepository _movieRepository;
+    private readonly IPurchaseRepository _purchaseRepository;
 
-    public AdminService(IMovieRepository movieRepository)
+    public AdminService(IMovieRepository movieRepository, IPurchaseRepository purchaseRepository)
     {
         _movieRepository = movieRepository;
+        _purchaseRepository = purchaseRepository;
     }
 
-    public async Task<IEnumerable<MovieCardModel>> GetTopMoviesAsync()
+    public async Task<IEnumerable<TopMovieModel>> GetTopMoviesAsync(DateTime? fromDate = null, DateTime? toDate = null)
     {
-        var movies = _movieRepository.GetTopRatedMovies().Take(24);
-
-        var result = movies.Select(m => new MovieCardModel
-        {
-            Id = m.Id,
-            Title = m.Title,
-            PosterUrl = m.PosterUrl
-        });
-
-        return await Task.FromResult(result);
+        return await _purchaseRepository.GetAllMoviesSortedByPurchasesAsync(fromDate, toDate);
     }
+
+
 
     public async Task<int> CreateMovieAsync(Movie movie)
     {

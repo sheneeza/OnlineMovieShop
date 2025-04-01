@@ -15,11 +15,13 @@ public class AdminController : Controller
         _adminService = adminService;
     }
 
-    public async Task<IActionResult> TopMovies()
+    [HttpGet]
+    public async Task<IActionResult> TopMovies(DateTime? fromDate, DateTime? toDate)
     {
-        var movies = await _adminService.GetTopMoviesAsync();
+        var movies = await _adminService.GetTopMoviesAsync(fromDate, toDate);
         return View(movies);
     }
+
 
     [HttpGet]
     public IActionResult CreateMovie()
