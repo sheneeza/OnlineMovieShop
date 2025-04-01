@@ -53,13 +53,15 @@ else
         {
             <div class="col">
                 <div class="card h-100 shadow-sm">
-                    <img src="@movie.PosterUrl" class="card-img-top" alt="@movie.Title" />
+                    <a asp-controller="Movies" asp-action="Details" asp-route-id="@movie.Id">
+                        <img src="@movie.PosterUrl" class="card-img-top" alt="@movie.Title" />
+                    </a>
                     <div class="card-body bg-dark text-center">
                         <button type="button" class="btn btn-outline-light btn-sm"
                                 onclick="showPurchaseAlert('@movie.PurchaseDateTime.ToString("MMM dd, yyyy")', 
-                                                           '@movie.TotalPrice.ToString("C")', 
-                                                           '@movie.PurchaseNumber',
-                                                           '@movie.PosterUrl')">
+                                                       '@movie.TotalPrice.ToString("C")', 
+                                                       '@movie.PurchaseNumber',
+                                                       '@movie.PosterUrl')">
                             Purchase Details
                         </button>
                     </div>
@@ -67,6 +69,7 @@ else
             </div>
         }
     </div>
+
 }
 
 <!-- Purchase Details Alert -->

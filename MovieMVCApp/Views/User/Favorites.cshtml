@@ -16,13 +16,9 @@ else
         @foreach (var movie in Model)
         {
             <div class="col">
-                <div class="card h-100 shadow-sm">
-                    <img src="@movie.PosterUrl" class="card-img-top" alt="@movie.Title" />
-                    <div class="card-body">
-                        <h6 class="card-title">@movie.Title</h6>
-                    </div>
-                </div>
+                <partial name="_MovieCard" model="movie" />
             </div>
         }
     </div>
+
 }
